@@ -8,7 +8,7 @@ include('includes/functions.php');
 
 
 if (strlen($_SESSION['alogin']) == "") {
-    header("Location: index.php");  
+    redirect_To("index.php");
 } else {
     if (isset($_POST['submit'])) {
 
@@ -30,9 +30,10 @@ if (strlen($_SESSION['alogin']) == "") {
         $lastInsertId = $dbh->lastInsertId();
 
         if ($lastInsertId) {
-            $msg = "Class created successfully";           
+            $msg = "Class created successfully";
         } else {
-            $error = "Class not added successfully";
+            $errors = $query->errorInfo();
+            $error = ($errors[2]);
         }
     }
 ?>
@@ -127,9 +128,15 @@ if (strlen($_SESSION['alogin']) == "") {
                                             <?php if ($msg) { ?>
                                                 <div class="alert alert-success left-icon-alert" role="alert">
                                                     <strong>Well done! </strong><?php echo htmlentities($msg); ?>
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                                                        <span aria-hidden="true"> &times; </span>
+                                                    </button>
                                                 </div><?php } else if ($error) { ?>
                                                 <div class="alert alert-danger left-icon-alert" role="alert">
                                                     <strong>Oh snap!</strong> <?php echo htmlentities($error); ?>
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                                                        <span aria-hidden="true"> &times; </span>
+                                                    </button>
                                                 </div>
                                             <?php } ?>
 
@@ -160,7 +167,10 @@ if (strlen($_SESSION['alogin']) == "") {
                                                     <div class="form-group has-success">
 
                                                         <div class="">
-                                                            <button type="submit" name="submit" class="btn btn-success btn-labeled">Submit<span class="btn-label btn-label-right"><i class="fa fa-check"></i></span></button>
+                                                            <button type="submit" name="submit" class="btn btn-success btn-labeled">Submit
+                                                                <span class="btn-label btn-label-right"><i class="fa fa-check"></i></span>
+                                                            </button>
+                                                            <button class="btn btn-secondary"> <a href="manage-classes.php"> Back </a> </button>
                                                         </div>
 
 
@@ -209,6 +219,11 @@ if (strlen($_SESSION['alogin']) == "") {
         <script src="js/main.js"></script>
 
 
+        <script>
+            if (window.history.replaceState) {
+                window.history.replaceState(null, null, window.location.href);
+            }
+        </script>
 
         <!-- ========== ADD custom.js FILE BELOW WITH YOUR CHANGES ========== -->
     </body>
