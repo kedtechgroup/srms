@@ -27,15 +27,15 @@ if (strlen($_SESSION['alogin']) == "") {
             $query = "INSERT INTO `admin`(`UserName`, `Password`, `updationDate`) 
                 VALUES ('$name','$password',CURRENT_TIMESTAMP())";
 
-            $execute = mysqli_query($con, $query);
+            $execute = mysqli_query($con, $query) or die(mysqli_error($con));
 
 
             if ($execute) {
                 $msg = "Admin added successfully";
             } else {
-                $error = "Admin Not Added Successfully";
+                $error = mysqli_error($con);
             }
-        }else{
+        } else {
             $error = "Password dont match";
         }
     }
@@ -47,7 +47,8 @@ if (strlen($_SESSION['alogin']) == "") {
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>SMS Admin| Teacher Registration< </title> <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
+        <title>SMS Admin| Admin Registration< </title>
+         <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
                 <link rel="stylesheet" href="css/font-awesome.min.css" media="screen">
                 <link rel="stylesheet" href="css/animate-css/animate.min.css" media="screen">
                 <link rel="stylesheet" href="css/lobipanel/lobipanel.min.css" media="screen">
@@ -104,9 +105,9 @@ if (strlen($_SESSION['alogin']) == "") {
                                         <div class="panel-heading">
                                             <div class="panel-title">
                                                 <h5>Administrator</h5>
-                                                 <!-- <a href="" style=float:right  class="btn btn-xs btn-primary">Manage Users</a> -->
+                                                <!-- <a href="" style=float:right  class="btn btn-xs btn-primary">Manage Users</a> -->
                                             </div>
-                                           
+
                                         </div>
                                         <div class="panel-body">
 
