@@ -4,10 +4,11 @@ session_start();
 error_reporting(0);
 
 include('includes/config.php');
+include('includes/functions.php');
 
 if (strlen($_SESSION['alogin']) == "") {
 
-    header("Location: index.php");
+    redirect_To('index.php');
 } else {
     if (isset($_POST['submit'])) {
         $studentname = $_POST['fullanme'];
@@ -31,11 +32,10 @@ if (strlen($_SESSION['alogin']) == "") {
         if ($lastInsertId) {
             $msg = "Student info added successfully";
         } else {
-            $error = "Not added Successfully";
+            $errors = $query->errorInfo();
+            $error = ($errors[2]);
         }
     }
-
-
 
 ?>
     <!DOCTYPE html>
@@ -121,13 +121,13 @@ if (strlen($_SESSION['alogin']) == "") {
                                             <div class="panel-heading">
                                                 <div class="panel-title">
                                                     <div class="container-fluid">
-                                                    <h5 class="lead"> View All Students
-                                                    <a style="float: right" class="btn btn-info" data-toggle="modal" data-target="#exampleModalCenter"> 
-                                                            <i class="fa fa-plus"></i>Add Student
-                                                        </a>
-                                                    </h5>
+                                                        <h5 class="lead"> View All Students
+                                                            <a style="float: right" class="btn btn-info" data-toggle="modal" data-target="#exampleModalCenter">
+                                                                <i class="fa fa-plus"></i>Add Student
+                                                            </a>
+                                                        </h5>
                                                     </div>
-        
+
                                                 </div>
                                             </div>
                                             <?php if ($msg) { ?>
