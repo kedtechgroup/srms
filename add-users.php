@@ -14,13 +14,13 @@ if (strlen($_SESSION['alogin']) == "") {
 
     if (isset($_POST['submit'])) {
 
-         global $con;
+        global $con;
 
         $name = $_POST['name'];
         $id_no = $_POST['id_no'];
         $email = $_POST['email'];
         $phone = $_POST['phone'];
-        
+
 
         $query = "INSERT INTO `tblteachers`( `name`, `id_no`, `email`, `phone`, `created_at`)
         VALUES ('$name', '$id_no', '$email', '$phone',  CURRENT_TIMESTAMP())";
@@ -31,7 +31,7 @@ if (strlen($_SESSION['alogin']) == "") {
         if ($execute) {
             $msg = "Teacher added successfully";
         } else {
-            $error = "Teacher Not Added Successfully";
+            $error = mysqli_error($con);
         }
     }
 ?>
@@ -186,6 +186,10 @@ if (strlen($_SESSION['alogin']) == "") {
                         minimumResultsForSearch: Infinity
                     });
                 });
+
+                if (window.history.replaceState) {
+                    window.history.replaceState(null, null, window.location.href);
+                }
             </script>
     </body>
 
