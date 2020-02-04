@@ -3,7 +3,9 @@
 session_start();
 error_reporting(0);
 
-include('includes/config.php');
+
+include('includes/db.php');
+
 require_once('includes/functions.php');
 
 if (strlen($_SESSION['alogin']) == "") {
@@ -11,39 +13,28 @@ if (strlen($_SESSION['alogin']) == "") {
 } else {
 
     if (isset($_POST['submit'])) {
-        $teachername = $_POST['name'];
+
+         global $con;
+
+        $name = $_POST['name'];
         $id_no = $_POST['id_no'];
         $email = $_POST['email'];
-        $cities = $_POST['cities'];
-        $password = "teacher";
-        $categories_id = $_POST['categories_id'];
-        
         $phone = $_POST['phone'];
-
-        $status = 1;
         
-        $query = "INSERT INTO tblteachers(`name`, `id_no`,`email`, `phone`, `password`, `categories_id`, `cities`, `photo`, `created_at`) 
-            VALUES (:teachername,:id_no,:email,:phone,:password,:categories_id,:cities, '1997-02-01' )";
 
-       
-        $query = $dbh->prepare($sql);
-        $query->bindParam(':teachename', $teachername, PDO::PARAM_STR);
-        $query->bindParam(':id_no', $id_no, PDO::PARAM_STR);
-        $query->bindParam(':email', $email, PDO::PARAM_STR);
-        $query->bindParam(':phone', $phone, PDO::PARAM_STR);
-        $query->bindParam(':classid', $classid, PDO::PARAM_STR);
-        $query->bindParam(':dob', $dob, PDO::PARAM_STR);
-        $query->bindParam(':status', $status, PDO::PARAM_STR);
-        $query->execute();
+        $query = "INSERT INTO `tblteachers`( `name`, `id_no`, `email`, `phone`, `created_at`)
+        VALUES ('$name', '$id_no', '$email', '$phone',  CURRENT_TIMESTAMP())";
 
-        $lastInsertId = $dbh->lastInsertId();
-        if ($lastInsertId) {
+        $execute = mysqli_query($con, $query);
+
+
+        if ($execute) {
             $msg = "Teacher added successfully";
         } else {
-            $error = "Something went wrong. Please try again";
+            $error = "Teacher Not Added Successfully";
         }
     }
-    ?>
+?>
     <!DOCTYPE html>
     <html lang="en">
 
@@ -117,14 +108,14 @@ if (strlen($_SESSION['alogin']) == "") {
                                                 <div class="alert alert-success left-icon-alert" role="alert">
                                                     <strong>Well done! </strong><?php echo htmlentities($msg); ?>
                                                     <button type="button" class="close" data-dismiss="alert" aria-label="close">
-                                                    <span aria-hidden="true"> &times; </span>
-                                                </button>
+                                                        <span aria-hidden="true"> &times; </span>
+                                                    </button>
                                                 </div><?php } else if ($error) { ?>
                                                 <div class="alert alert-danger left-icon-alert" role="alert">
                                                     <strong>Oh snap! </strong> <?php echo htmlentities($error); ?>
                                                     <button type="button" class="close" data-dismiss="alert" aria-label="close">
-                                                    <span aria-hidden="true"> &times; </span>
-                                                </button>
+                                                        <span aria-hidden="true"> &times; </span>
+                                                    </button>
                                                 </div>
                                             <?php } ?>
 
@@ -133,13 +124,13 @@ if (strlen($_SESSION['alogin']) == "") {
                                                 <div class="form-group">
                                                     <label for="default" class="col-sm-2 control-label">Full Name</label>
                                                     <div class="col-sm-10">
-                                                        <input type="text" name="fullname" class="form-control" id="fullanme" required="required" autocomplete="off">
+                                                        <input type="text" name="name" class="form-control" id="fullanme" required="required" autocomplete="off">
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="default" class="col-sm-2 control-label">Teacher ID</label>
                                                     <div class="col-sm-10">
-                                                        <input type="text" name="id_no" class="form-control" id="rollid" maxlength="5" required="required" autocomplete="off">
+                                                        <input type="text" name="id_no" class="form-control" id="rollid" maxlength="10" required="required" autocomplete="off">
                                                     </div>
                                                 </div>
 
@@ -157,68 +148,6 @@ if (strlen($_SESSION['alogin']) == "") {
                                                         <input type="phone" name="phone" class="form-control" id="phone" required="required" autocomplete="off">
                                                     </div>
                                                 </div>
-
-
-
-                                                <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Gender</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="radio" name="gender" value="Male" required="required" checked="">Male
-                                                        <input type="radio" name="gender" value="Female" required="required">Female
-                                                        <input type="radio" name="gender" value="Other" required="required">Other
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Teachers Category</label>
-                                                    <div class="col-sm-10">
-                                                        <select name="categories_id" class="form-control" id="default" required="required">
-                                                            <option value="">Select Category</option>
-
-                                                            <?php $sql = "SELECT * from tblcategories";
-                                                                $query = $dbh->prepare($sql);
-                                                                $query->execute();
-                                                                $results = $query->fetchAll(PDO::FETCH_OBJ);
-                                                                if ($query->rowCount() > 0) {
-                                                                    foreach ($results as $result) {   ?>
-                                                                    <option value="<?php echo htmlentities($result->id); ?>">
-                                                                        <?php echo htmlentities($result->name); ?>
-                                                                    </option>
-                                                            <?php }
-                                                                } ?>
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Physical Address </label>
-                                                    <div class="col-sm-10">
-                                                        <select name="cities" class="form-control" id="default" required="required">
-                                                            <option value="">Select Address</option>
-
-                                                            <?php $sql = "SELECT * from cities";
-                                                                $query = $dbh->prepare($sql);
-                                                                $query->execute();
-                                                                $results = $query->fetchAll(PDO::FETCH_OBJ);
-                                                                if ($query->rowCount() > 0) {
-                                                                    foreach ($results as $result) {   ?>
-                                                                    <option value="<?php echo htmlentities($result->id); ?>">
-                                                                        <?php echo htmlentities($result->name); ?>
-                                                                    </option>
-                                                            <?php }
-                                                                } ?>
-                                                        </select>
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label for="date" class="col-sm-2 control-label">DOB</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="date" name="dob" class="form-control" id="date">
-                                                    </div>
-                                                </div>
-
-
 
                                                 <div class="form-group">
                                                     <div class="col-sm-offset-2 col-sm-10">
