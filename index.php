@@ -28,10 +28,14 @@ if (isset($_POST['login'])) {
 
         $_SESSION['alogin'] = $_POST['username'];
 
-        echo "<script type='text/javascript'> document.location = 'dashboard.php'; </script>";
+        echo "<script type='text/javascript'>
+                document.location = 'dashboard.php';
+            </script>";
     } else {
 
-        echo "<script>alert('Invalid User Details');</script>";
+        echo "<script>
+                  alert('Invalid User Details');
+              </script>";
     }
 }
 
@@ -61,7 +65,8 @@ if (isset($_POST['login'])) {
                 <h1 align="center">
                     <img src="images/tile.png" alt="" width="100" height="100">
                     <br>
-                    Al Munawar Madrasatul Islamiyyah </h1>
+                    Al Munawar Madrasatul Islamiyyah
+                  </h1>
                 <div class=" visible-lg-block">
 
                 </div>
