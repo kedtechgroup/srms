@@ -5,12 +5,39 @@ error_reporting(0);
 
 include('includes/config.php');
 
+include('includes/db.php');
+include('includes/functions.php');
+
 $cid =  $_GET['cid'];
 
 $sql = "SELECT * FROM tblclasses WHERE id = $cid";
 $query = $dbh->prepare($sql);
 $query->execute();
 $results = $query->fetchAll(PDO::FETCH_OBJ);
+
+if (isset($_POST['submit'])) {
+
+    global $con;
+
+    $id = $_POST['id'];
+    $year_id = $_POST['year_id'];
+
+    $query = "INSERT INTO `class_exams`(`class_id`, `exam_id`, `created_at`, `year_id`)
+                 VALUES ('$cid','$id',CURRENT_TIMESTAMP(),'$year_id')";
+
+    $execute = mysqli_query($con, $query);
+
+
+    if ($execute) {
+        redirect_To('class_subjects.php?cid=' . $cid);
+        
+        $msg = "Exam Added Successfully";
+         
+    } else {
+        $error = mysqli_error($con);
+    }
+}
+
 
 if ($query->rowCount() > 0) {
     foreach ($results as $result) {
@@ -68,8 +95,6 @@ if ($query->rowCount() > 0) {
                                     <div class="col-md-12">
                                         <h2 class="title"><i class="lead">Class:</i><?php echo htmlentities($result->ClassName) ?>
                                             . <i class="lead">Stream:</i> <?php echo htmlentities($result->Section)  ?></h2>
-
-
                                     </div>
 
                                     <!-- /.col-md-6 text-right -->
@@ -81,6 +106,7 @@ if ($query->rowCount() > 0) {
                                             <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
                                             <li> Classes</li>
                                             <li class="active">Manage Classes</li>
+
                                         </ul>
                                     </div>
 
@@ -92,8 +118,121 @@ if ($query->rowCount() > 0) {
                             <section class="section">
                                 <div class="container-fluid">
 
+                                    <div class="row">
+                                        <div class="col-md-12">
+
+                                            <div class="panel">
+                                                <div class="panel-heading">
+                                                    <div class="panel-title">
+
+                                                        <div class="panel-title">
+
+                                                            <div class="container-fluid">
+                                                                <a style="float: right" class="btn btn-info" data-toggle="modal" data-target="#exampleModalCenter">
+                                                                    <i class="fa fa-plus">
+                                                                    </i>Add Exam
+                                                                </a>
+                                                                <h5>View Exams</h5>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <?php if ($msg) { ?>
+                                                <div class="alert alert-success alert-dismissible left-icon-alert" role="alert">
+                                                    <strong>Well done!</strong><?php echo htmlentities($msg); ?>
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                                                        <span aria-hidden="true"> &times; </span>
+                                                    </button>
+                                                </div>
+                                            <?php } else if ($error) { ?>
+                                                <div class="alert alert-danger alert-dismissible left-icon-alert" role="alert">
+                                                    <strong>Oh snap!</strong> <?php echo htmlentities($error); ?>
+                                                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                                                        <span aria-hidden="true"> &times; </span>
+                                                    </button>
+                                                </div>
+                                            <?php } ?>
+
+                                                <div class="panel-body p-20">
+
+                                                    <table id="example" class="display table table-striped table-bordered" cellspacing="0" width="100%">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>#</th>
+                                                                <th>Exams</th>
+                                                                <th>Date Entered</th>
+                                                                <th>Exam Period</th>
+                                                                <th>Action</th>
+
+                                                            </tr>
+                                                        </thead>
+
+                                                        <tbody>
+                                                            <?php
+
+                                                            $sql = "SELECT DISTINCT * FROM exam join class_exams on exam.exam_id = class_exams.exam_id 
+                                                                    JOIN year on year.year_id = class_exams.year_id WHERE class_id = '$cid'";
+
+                                                            $query = $dbh->prepare($sql);
+                                                            $query->execute();
+                                                            $results = $query->fetchAll(PDO::FETCH_OBJ);
+                                                            $cnt = 1;
+
+                                                            if ($query->rowCount() > 0) {
+                                                                foreach ($results as $result) {   ?>
+                                                                    <tr>
+                                                                        <td><?php echo htmlentities($cnt); ?></td>
+                                                                        <td>
+                                                                            <a href="class_performance.php?exam_id=<?php echo htmlentities($result->id)?>&exam_period=<?php echo htmlentities($result->year_id)?>&cid=<?php echo $cid ?>">
+                                                                                
+                                                                                <?php echo htmlentities($result->exam_name); ?>
+                                                                            </a>
+                                                                        </td>
+                                                                        <td>
+
+                                                                            <?php echo htmlentities($result->created_at); ?>
+
+                                                                        </td>
+                                                                        <td>
+
+                                                                           <a href="manage-exam-periods.php"> <?php echo htmlentities($result->year_name); ?></a>
+
+                                                                        </td>
+
+                                                                        <td>
+                                                                            <a href="edit-subject.php?stid=<?php echo htmlentities($result->SubjectId); ?>">
+                                                                                <i class="btn-sm btn-info">Edit</i>
+                                                                            </a>
+                                                                            <a href="delete-subject.php?delete=<?php echo htmlentities($result->SubjectId); ?>">
+                                                                                <i class="btn-sm btn-danger">Delete</i>
+                                                                            </a>
+
+                                                                        </td>
+
+                                                                    </tr>
+                                                            <?php $cnt = $cnt + 1;
+                                                                }
+                                                            } ?>
 
 
+                                                        </tbody>
+                                                    </table>
+
+
+                                                    <!-- /.col-md-12 -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- /.col-md-6 -->
+                                    </div>
+                                    <!-- /.col-md-12 -->
+                                </div>
+                            </section>
+
+                            <section class="section">
+                                <div class="container-fluid">
                                     <div class="row">
                                         <div class="col-md-12">
 
@@ -104,8 +243,6 @@ if ($query->rowCount() > 0) {
 
                                                         <h6>Total number of students taught in <?php echo htmlentities($result->ClassName) ?>
                                                             and their names and gender</h6>
-
-
 
 
                                                         <!-- Modal -->
@@ -136,6 +273,7 @@ if ($query->rowCount() > 0) {
                                                             $query = $dbh->prepare($sql);
                                                             $query->execute();
                                                             $results = $query->fetchAll(PDO::FETCH_OBJ);
+
                                                             $cnt = 1;
                                                             if ($query->rowCount() > 0) {
                                                                 foreach ($results as $result) {   ?>
@@ -249,7 +387,7 @@ if ($query->rowCount() > 0) {
                                                         <tbody>
                                                             <?php
 
-                                                            $sql = "SELECT * from tblsubjectcombination JOIN tblsubjects on tblsubjectcombination.SubjectId = tblsubjects.id
+                                                            $sql = "SELECT * from tblsubjectcombination JOIN tblsubjects on tblsubjectcombination.SubjectId = tblsubjects.subject_id
                                                             WHERE ClassId = $cid";
 
                                                             $query = $dbh->prepare($sql);
@@ -307,6 +445,8 @@ if ($query->rowCount() > 0) {
                                     <!-- /.col-md-12 -->
                                 </div>
                             </section>
+
+
                         </div>
                         <!-- /.panel -->
                     </div>
@@ -325,7 +465,81 @@ if ($query->rowCount() > 0) {
             <!-- /.content-container -->
             </div>
             <!-- /.content-wrapper -->
+            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Add Exam</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
 
+                        <div class="modal-body">
+                            <form method="post">
+                                <div class="form-group has-success">
+                                    <label for="default" class="col-sm-2 control-label">Exam</label>
+                                    <div class="col-sm-10">
+                                        <select name="id" class="form-control" id="default" required="required">
+                                            <option value="">Select Exam</option>
+
+                                            <?php
+                                            $sql = "SELECT * from exam";
+                                            $query = $dbh->prepare($sql);
+                                            $query->execute();
+                                            $results = $query->fetchAll(PDO::FETCH_OBJ);
+                                            if ($query->rowCount() > 0) {
+                                                foreach ($results as $result) {   ?>
+                                                    <option value="<?php echo htmlentities($result->exam_id); ?>">
+                                                        <?php echo htmlentities($result->exam_name); ?>
+                                                    </option>
+                                            <?php }
+                                            } ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group has-success">
+                                    <label for="default" class="col-sm-2 control-label">Year</label>
+                                    <div class="col-sm-10">
+                                        <select name="year_id" class="form-control" id="default" required="required">
+                                            <option value="">Select Year</option>
+
+                                            <?php
+                                            $sql = "SELECT * from year";
+                                            $query = $dbh->prepare($sql);
+                                            $query->execute();
+                                            $results = $query->fetchAll(PDO::FETCH_OBJ);
+                                            if ($query->rowCount() > 0) {
+                                                foreach ($results as $result) {   ?>
+                                                    <option value="<?php echo htmlentities($result->year_id); ?>">
+                                                        <?php echo htmlentities($result->year_name); ?>
+                                                    </option>
+                                            <?php }
+                                            } ?>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group has-success">
+
+                                    <div class="">
+                                        <button type="submit" name="submit" class="btn btn-success btn-labeled">Submit
+                                            <span class="btn-label btn-label-right"><i class="fa fa-check"></i></span>
+                                        </button>
+                                        <button class="btn btn-secondary"> <a href="manage-exam.php"> Back </a> </button>
+                                    </div>
+
+
+
+                            </form>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
             </div>
             <!-- /.main-wrapper -->
 
