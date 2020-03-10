@@ -80,7 +80,7 @@ if(strlen($_SESSION['alogin'])==""){
                                     <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                                         <a class="dashboard-stat bg-danger" href="manage-subjects.php">
                                         <?php
-                                        $sql ="SELECT id from  tblsubjects ";
+                                        $sql ="SELECT subject_id from  tblsubjects ";
                                         $query = $dbh -> prepare($sql);
                                         $query->execute();
                                         $results=$query->fetchAll(PDO::FETCH_OBJ);
@@ -114,7 +114,7 @@ if(strlen($_SESSION['alogin'])==""){
                                     <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
                                         <a class="dashboard-stat bg-black" href="manage-results.php">
                                         <?php
-                                            $sql3="SELECT  distinct StudentId from  tblresult ";
+                                            $sql3="SELECT  distinct students_id from  result ";
                                             $query3 = $dbh -> prepare($sql3);
                                             $query3->execute();
                                             $results3=$query3->fetchAll(PDO::FETCH_OBJ);
@@ -141,170 +141,6 @@ if(strlen($_SESSION['alogin'])==""){
                         </section>
                         <!-- /.section -->
 
-                        <section class="section">
-                            <div class="container-fluid">
-
-
-
-                                <div class="row">
-                                    <div class="col-md-12">
-
-                                        <div class="panel">
-                                            <div class="panel-heading">
-                                                <div class="panel-title">
-                                                    <h5>Top performing Students</h5>
-                                                </div>
-                                            </div>
-                                            <?php if ($msg) { ?>
-                                                <div class="alert alert-success left-icon-alert" role="alert">
-                                                    <strong>Well done!</strong><?php echo htmlentities($msg); ?>
-                                                </div><?php } else if ($error) { ?>
-                                                <div class="alert alert-danger left-icon-alert" role="alert">
-                                                    <strong>Oh snap!</strong> <?php echo htmlentities($error); ?>
-                                                </div>
-                                            <?php } ?>
-                                            <div class="panel-body p-20">
-
-                                                <table id="example" class="display table table-striped table-bordered" cellspacing="0" width="100%">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>#</th>
-                                                            <th>Student Name</th>
-                                                            <th>Roll Id</th>
-                                                            <th>Class</th>
-                                                            <th>Reg Date</th>
-                                                            <th>Marks</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    
-                                                    </tfoot>
-                                                    <tbody>
-                                                        <?php $sql = "SELECT  distinct tblresult.marks,tblclasses.id,tblstudents.StudentName,tblstudents.RollId,tblstudents.RegDate,tblstudents.StudentId,tblstudents.Status,tblclasses.ClassName,tblclasses.Section 
-                                                                     from tblresult join tblstudents
-                                                                      on tblstudents.StudentId=tblresult.StudentId  
-                                                                      join tblclasses on tblclasses.id=tblresult.ClassId
-                                                                       ORDER BY tblresult.marks desc ";
-                                                        $query = $dbh->prepare($sql);
-                                                        $query->execute();
-                                                        $results = $query->fetchAll(PDO::FETCH_OBJ);
-                                                        $cnt = 1;
-                                                        if ($query->rowCount() > 0) {
-                                                            foreach ($results as $result) {   ?>
-                                                                <tr>
-                                                                    <td><?php echo htmlentities($cnt); ?></td>
-                                                                    <td>
-                                                                        
-                                                                        <a href="view_student_performance.php?stid=<?php echo htmlentities($result->StudentId); ?>"><?php echo htmlentities($result->StudentName);
-                                                                         ?></a>
-                                                                    </td>
-                                                                    <td><?php echo htmlentities($result->RollId); ?></td>
-                                                                    <td><a href="view_class.php?cid=<?php echo htmlentities($result->id); ?>">
-                                                                        <?php echo htmlentities($result->ClassName); ?>
-                                                                            (<?php echo htmlentities($result->Section); ?>)</a>
-                                                                    </td>
-                                                                    <td><?php echo htmlentities($result->RegDate); ?></td>
-                                                                    <td><?php echo htmlentities($result->marks); ?></td>
-                                                                    <td>
-                                                                        <a href="edit-result.php?stid=<?php echo htmlentities($result->StudentId); ?>">
-                                                                            <i class="btn btn-xs btn-primary">View Results</i> </a>
-
-                                                                    </td>
-                                                                </tr>
-                                                        <?php $cnt = $cnt + 1;
-                                                            }
-                                                        } ?>
-
-
-                                                    </tbody>
-                                                </table>
-
-
-                                                <!-- /.col-md-12 -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- /.col-md-6 -->
-
-
-                                </div>
-                                <!-- /.col-md-12 -->
-                            </div>
-                        </section>
-
-                        <section class="section">
-                            <div class="container-fluid">
-
-                                <div class="row">
-                                    <div class="col-md-12">
-
-                                        <div class="panel">
-                                            <div class="panel-heading">
-                                                <div class="panel-title">
-                                                    <h5>Top performing Subject</h5>
-                                                </div>
-                                            </div>
-                                          
-                                            <div class="panel-body p-20">
-
-                                                <table id="example2" class="display table table-striped table-bordered" cellspacing="0" width="100%">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>#</th>
-                                                            <th>SUbject Name</th>
-                                                            <th>Score</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                    </thead>
-                                                    
-                                                    </tfoot>
-                                                    <tbody>
-                                                        <?php $sql = "SELECT *
-                                                                     from tblsubjects join tblresult
-                                                                      on tblsubjects.id=tblresult.SubjectId  
-                                                                      
-                                                                       ORDER BY tblresult.marks desc ";
-                                                        $query = $dbh->prepare($sql);
-                                                        $query->execute();
-                                                        $results = $query->fetchAll(PDO::FETCH_OBJ);
-                                                        $cnt = 1;
-                                                        if ($query->rowCount() >=0 ) {
-                                                            foreach ($results as $result) {   ?>
-                                                                <tr>
-                                                                    <td><?php echo htmlentities($cnt); ?></td>
-                                                                    <td>
-                                                                        
-                                                                        <a href="view_student_performance.php?stid=<?php echo htmlentities($result->SubjectName); ?>"><?php echo htmlentities($result->SubjectName);
-                                                                         ?></a>
-                                                                    </td>
-                                                                    
-                                                                    <td><?php echo htmlentities($result->marks); ?></td>
-                                                                    <td>
-                                                                        <a href="edit-result.php?stid=<?php echo htmlentities($result->StudentId); ?>">
-                                                                            <i class="btn btn-xs btn-primary">View Results</i> </a>
-
-                                                                    </td>
-                                                                </tr>
-                                                        <?php $cnt = $cnt + 1;
-                                                            }
-                                                        } ?>
-
-
-                                                    </tbody>
-                                                </table>
-
-
-                                                <!-- /.col-md-12 -->
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- /.col-md-6 -->
-
-
-                                </div>
-                                <!-- /.col-md-12 -->
-                            </div>
-                        </section>
                     </div>
                     <!-- /.main-page -->
 
@@ -360,7 +196,7 @@ if(strlen($_SESSION['alogin'])==""){
                   "debug": false,
                   "newestOnTop": true,
                   "progressBar": true,
-                  "positionClass": "toast-top-right",
+                  "positionClass": "toast-bottom-right",
                   "preventDuplicates": false,
                   "onclick": null,
                   "showDuration": "300",
@@ -372,7 +208,7 @@ if(strlen($_SESSION['alogin'])==""){
                   "showMethod": "fadeIn",
                   "hideMethod": "fadeOut"
                 }
-                toastr["success"]( "Welcome!");
+                // toastr["warning"]( "Welcome to Result Management!");
 
 
             });

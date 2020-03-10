@@ -4,32 +4,27 @@ session_start();
 error_reporting(0);
 
 include('includes/config.php');
+include('includes/db.php');
 
 if (strlen($_SESSION['alogin']) == "") {
     header("Location: index.php");
 } else {
     if (isset($_POST['submit'])) {
 
-        $classname = $_POST['classname'];
-        $classnamenumeric = $_POST['classnamenumeric'];
-        $section = $_POST['section'];
+        $name=$_POST['name'];
+        
+        global $con;
 
-        $sql = "INSERT INTO  tblclasses(ClassName,ClassNameNumeric,Section) VALUES(:classname,:classnamenumeric,:section)";
+        $query="INSERT INTO `stream`(`name`,`created_at`)
+        VALUES ('$name',CURRENT_TIMESTAMP())";
 
-        $query = $dbh->prepare($sql);
+        $execute = mysqli_query($con,$query);
 
-        $query->bindParam(':classname', $classname, PDO::PARAM_STR);
-        $query->bindParam(':classnamenumeric', $classnamenumeric, PDO::PARAM_STR);
-        $query->bindParam(':section', $section, PDO::PARAM_STR);
-
-        $query->execute();
-
-        $lastInsertId = $dbh->lastInsertId();
-
-        if ($lastInsertId) {
-            $msg = "Class Created successfully";
-        } else {
-            $error = "Something went wrong. Please try again";
+        if ($execute){
+            $msg="Category Added successfully";
+        }
+        else{
+            $error="Something went wrong. Please try again";
         }
     }
 
@@ -84,7 +79,7 @@ if (strlen($_SESSION['alogin']) == "") {
                         <div class="container-fluid">
                             <div class="row page-title-div">
                                 <div class="col-md-6">
-                                    <h2 class="title">Manage Teachers</h2>
+                                    <h2 class="title">Manage Stream</h2>
 
                                 </div>
 
@@ -95,8 +90,8 @@ if (strlen($_SESSION['alogin']) == "") {
                                 <div class="col-md-6">
                                     <ul class="breadcrumb">
                                         <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-                                        <li> Teachers</li>
-                                        <li class="active">Manage Teachers</li>
+                                        <li> Stream</li>
+                                        <li class="active">Manage Stream</li>
                                     </ul>
                                 </div>
 
@@ -119,9 +114,9 @@ if (strlen($_SESSION['alogin']) == "") {
 
                                                     <div class="container-fluid">
                                                         <a style="float: right" class="btn btn-info" data-toggle="modal" data-target="#exampleModalCenter"> <i class="fa fa-plus">
-                                                            </i>Add Teacher
+                                                            </i>Add Stream
                                                         </a>
-                                                        <h5>View All Teachers</h5>
+                                                        <h5>View Classes Info</h5>
                                                     </div>
 
 
@@ -151,39 +146,38 @@ if (strlen($_SESSION['alogin']) == "") {
                                                     <thead>
                                                         <tr>
                                                             <th>#</th>
-                                                            <th>Teacher Name</th>
-                                                            <th>ID No</th>
-                                                            <th>Phone #</th>
-                                                            <th>Email</th>
+                                                            <th>Class Name</th>
+
+                                                            <th>Creation Date</th>
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
 
                                                     <tbody>
-                                                        <?php $sql = "SELECT * from tblteachers";
+                                                        <?php $sql = "SELECT * from stream";
                                                         $query = $dbh->prepare($sql);
                                                         $query->execute();
                                                         $results = $query->fetchAll(PDO::FETCH_OBJ);
                                                         $cnt = 1;
+
+
+
 
                                                         if ($query->rowCount() > 0) {
                                                             foreach ($results as $result) {   ?>
                                                                 <tr>
                                                                     <td><?php echo htmlentities($cnt); ?></td>
                                                                     <td>
-                                                                        <a href="class_subjects.php?cid=<?php echo htmlentities($result->id) ?>">
+                                                                        <a href="class_stream.php?sid=<?php echo htmlentities($result->id) ?>">
                                                                             <?php echo htmlentities($result->name); ?>
                                                                         </a>
                                                                     </td>
-                                                                    <td><?php echo htmlentities($result->id_no); ?></td>
-                                                                    <td><?php echo htmlentities($result->phone); ?></td>
-
-                                                                    <td><?php echo htmlentities($result->email); ?></td>
+                                                                    <td><?php echo htmlentities($result->created_at); ?></td>
                                                                     <td>
-                                                                        <a href="edit-class.php?classid=<?php echo htmlentities($result->id); ?>">
+                                                                        <a href="edit-stream.php?stream-id=<?php echo htmlentities($result->id); ?>">
                                                                             <i class="btn-sm btn-info">Edit</i>
                                                                         </a>
-                                                                        <a href="delete-class.php?classid=<?php echo htmlentities($result->id); ?>">
+                                                                        <a href="delete-stream.php?stream-id=<?php echo htmlentities($result->id); ?>">
                                                                             <i class="btn-sm btn-danger">Delete</i>
                                                                         </a>
 
@@ -200,8 +194,6 @@ if (strlen($_SESSION['alogin']) == "") {
 
                                                 <!-- /.col-md-12 -->
                                             </div>
-
-                                            
                                         </div>
                                     </div>
                                     <!-- /.col-md-6 -->
@@ -209,106 +201,6 @@ if (strlen($_SESSION['alogin']) == "") {
 
                                 </div>
                                 <!-- /.col-md-12 -->
-                                <div class="row">
-                                    <div class="col-md-12">
-
-                                        <div class="panel">
-                                            <div class="panel-heading">
-                                                <div class="panel-title">
-
-                                                    <div class="container-fluid">
-                                                        <a style="float: right" class="btn btn-info" data-toggle="modal" data-target="#exampleModalCenter"> <i class="fa fa-plus">
-                                                            </i>Add Teacher
-                                                        </a>
-                                                        <h5>View Subject Teachers</h5>
-                                                    </div>
-
-
-
-                                                    <!-- Modal -->
-
-                                                </div>
-                                            </div>
-                                            <?php if ($msg) { ?>
-                                                <div class="alert alert-success alert-dismissible left-icon-alert" role="alert">
-                                                    <strong>Well done!</strong><?php echo htmlentities($msg); ?>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
-                                                        <span aria-hidden="true"> &times; </span>
-                                                    </button>
-                                                </div>
-                                            <?php } else if ($error) { ?>
-                                                <div class="alert alert-danger alert-dismissible left-icon-alert" role="alert">
-                                                    <strong>Oh snap!</strong> <?php echo htmlentities($error); ?>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
-                                                        <span aria-hidden="true"> &times; </span>
-                                                    </button>
-                                                </div>
-                                            <?php } ?>
-                                            <div class="panel-body p-20">
-
-                                                <table id="example" class="display table table-hover table-striped table-bordered" 
-                                                cellspacing="0" width="100%">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>#</th>
-                                                            <th>Teacher Name</th>
-                                                            <th>ID No</th>
-                                                            <th>Subject</th>
-                                                            <th>Code</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                    </thead>
-
-                                                    <tbody>
-                                                        <?php $sql = "SELECT * FROM `teacher_subject` JOIN tblteachers ON teacher_subject.teacher_id = tblteachers.teacher_id 
-                                                                        JOIN tblsubjects ON teacher_subject.subject_id = tblsubjects.subject_id";
-                                                        $query = $dbh->prepare($sql);
-                                                        $query->execute();
-                                                        $results = $query->fetchAll(PDO::FETCH_OBJ);
-                                                        $cnt = 1;
-
-                                                        if ($query->rowCount() > 0) {
-                                                            foreach ($results as $result) {   ?>
-                                                                <tr>
-                                                                    <td><?php echo htmlentities($cnt); ?></td>
-                                                                    <td>
-                                                                        <a href="class_subjects.php?cid=<?php echo htmlentities($result->teacher_id) ?>">
-                                                                            <?php echo htmlentities($result->name); ?>
-                                                                        </a>
-                                                                    </td>
-                                                                    <td><?php echo htmlentities($result->id_no); ?></td>
-                                                                    <td><?php echo htmlentities($result->SubjectName); ?></td>
-
-                                                                    <td><?php echo htmlentities($result->SubjectCode); ?></td>
-                                                                    <td>
-                                                                        <a href="edit-class.php?classid=<?php echo htmlentities($result->id); ?>">
-                                                                            <i class="btn-sm btn-info">Edit</i>
-                                                                        </a>
-                                                                        <a href="delete-class.php?classid=<?php echo htmlentities($result->id); ?>">
-                                                                            <i class="btn-sm btn-danger">Delete</i>
-                                                                        </a>
-
-                                                                    </td>
-                                                                </tr>
-                                                        <?php $cnt = $cnt + 1;
-                                                            }
-                                                        } ?>
-
-
-                                                    </tbody>
-                                                </table>
-
-
-                                                <!-- /.col-md-12 -->
-                                            </div>
-
-                                            
-                                        </div>
-                                    </div>
-                                    <!-- /.col-md-6 -->
-
-
-                                </div>
                             </div>
                     </div>
                     <!-- /.panel -->
@@ -337,40 +229,28 @@ if (strlen($_SESSION['alogin']) == "") {
                     </div>
 
                     <div class="modal-body">
-                        <form method="post" id="prospects_form">
+                        <form method="post">
+
                             <div class="form-group has-success">
-                                <label for="success" class="control-label">Class Name</label>
+                                <label for="success" class="control-label">Stream Name</label>
                                 <div class="">
-                                    <input type="text" name="classname" class="form-control" required="required" id="success">
+                                    <input type="text" name="name" class="form-control" required="required" id="success">
                                     <span class="help-block">Eg- Third, Fouth,Sixth etc</span>
                                 </div>
                             </div>
+
+
                             <div class="form-group has-success">
-                                <label for="success" class="control-label">Class Name in Numeric</label>
+
                                 <div class="">
-                                    <input type="number" name="classnamenumeric" required="required" class="form-control" id="success">
-                                    <span class="help-block">Eg- 1,2,4,5 etc</span>
+                                    <button type="submit" name="submit" class="btn btn-success btn-labeled">Submit
+                                        <span class="btn-label btn-label-right"><i class="fa fa-check"></i></span>
+                                    </button>
+                                    <button class="btn btn-secondary"> <a href="manage-stream.php"> Back </a> </button>
                                 </div>
-                            </div>
-                            <div class="form-group has-success">
-                                <label for="success" class="control-label">Section</label>
-                                <div class="">
-                                    <input type="text" name="section" class="form-control" required="required" id="success">
-                                    <span class="help-block">Eg- A,B,C etc</span>
-                                </div>
-                            </div>
-                            <div class="form-group has-success">
 
 
-                            </div>
 
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Back</button>
-                                <button type="submit" name="submit" class="btn btn-success btn-labeled">Submit
-                                    <span class="btn-label btn-label-right"><i class="fa fa-check"></i>
-                                    </span>
-                                </button>
-                            </div>
                         </form>
                     </div>
 

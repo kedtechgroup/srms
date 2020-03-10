@@ -6,6 +6,7 @@ if (strlen($_SESSION['alogin']) == "") {
     header("Location: index.php");
 } else {
     if (isset($_POST['submit'])) {
+        
         $studentname = $_POST['fullanme'];
         $roolid = $_POST['rollid'];
         $studentemail = $_POST['emailid'];
@@ -13,9 +14,12 @@ if (strlen($_SESSION['alogin']) == "") {
         $classid = $_POST['class'];
         $dob = $_POST['dob'];
         $status = 1;
+
         $sql = "INSERT INTO  tblstudents(StudentName,RollId,StudentEmail,Gender,ClassId,DOB,Status) 
         VALUES(:studentname,:roolid,:studentemail,:gender,:classid,:dob,:status)";
-        $query = $dbh->prepare($sql);
+
+        $query = $dbh->prepare($sql) or die(mysqli_error($con));
+
         $query->bindParam(':studentname', $studentname, PDO::PARAM_STR);
         $query->bindParam(':roolid', $roolid, PDO::PARAM_STR);
         $query->bindParam(':studentemail', $studentemail, PDO::PARAM_STR);
@@ -24,11 +28,13 @@ if (strlen($_SESSION['alogin']) == "") {
         $query->bindParam(':dob', $dob, PDO::PARAM_STR);
         $query->bindParam(':status', $status, PDO::PARAM_STR);
         $query->execute();
+
         $lastInsertId = $dbh->lastInsertId();
+        
         if ($lastInsertId) {
             $msg = "Student info added successfully";
         } else {
-            $error = "Something went wrong. Please try again";
+            $error = (mysqli_error($con));
         }
     }
     ?>

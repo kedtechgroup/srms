@@ -14,24 +14,29 @@ if (strlen($_SESSION['alogin']) == "") {
 
     if (isset($_POST['submit'])) {
 
+
+
         global $con;
 
-        $name = $_POST['name'];
-        $id_no = $_POST['id_no'];
-        $email = $_POST['email'];
-        $phone = $_POST['phone'];
+        $name = $_POST['UserName'];
+        $password = md5($_POST['password']);
+        $confpassword = md5($_POST['confpassword']);
 
 
-        $query = "INSERT INTO `tblteachers`( `name`, `id_no`, `email`, `phone`, `created_at`)
-        VALUES ('$name', '$id_no', '$email', '$phone',  CURRENT_TIMESTAMP())";
+        if ($password == $confpassword) {
+            $query = "INSERT INTO `admin`(`UserName`, `Password`, `updationDate`) 
+                VALUES ('$name','$password',CURRENT_TIMESTAMP())";
 
-        $execute = mysqli_query($con, $query);
+            $execute = mysqli_query($con, $query) or die(mysqli_error($con));
 
 
-        if ($execute) {
-            $msg = "Teacher added successfully";
+            if ($execute) {
+                $msg = "Admin added successfully";
+            } else {
+                $error = mysqli_error($con);
+            }
         } else {
-            $error = mysqli_error($con);
+            $error = "Password dont match";
         }
     }
 ?>
@@ -42,7 +47,8 @@ if (strlen($_SESSION['alogin']) == "") {
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>SMS Admin| Teacher Registration< </title> <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
+        <title>SMS Admin| Admin Registration< </title>
+         <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
                 <link rel="stylesheet" href="css/font-awesome.min.css" media="screen">
                 <link rel="stylesheet" href="css/animate-css/animate.min.css" media="screen">
                 <link rel="stylesheet" href="css/lobipanel/lobipanel.min.css" media="screen">
@@ -70,7 +76,7 @@ if (strlen($_SESSION['alogin']) == "") {
                         <div class="container-fluid">
                             <div class="row page-title-div">
                                 <div class="col-md-6">
-                                    <h2 class="title">Add New Teacher</h2>
+                                    <h2 class="title">Add New Administrator</h2>
 
                                 </div>
 
@@ -82,7 +88,6 @@ if (strlen($_SESSION['alogin']) == "") {
                                     <ul class="breadcrumb">
                                         <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
 
-                                        <li class="active">Teacher Registration</li>
                                     </ul>
                                 </div>
 
@@ -99,8 +104,10 @@ if (strlen($_SESSION['alogin']) == "") {
                                     <div class="panel">
                                         <div class="panel-heading">
                                             <div class="panel-title">
-                                                <h5>Fill the Teacher info</h5>
+                                                <h5>Administrator</h5>
+                                                <!-- <a href="" style=float:right  class="btn btn-xs btn-primary">Manage Users</a> -->
                                             </div>
+
                                         </div>
                                         <div class="panel-body">
 
@@ -121,37 +128,35 @@ if (strlen($_SESSION['alogin']) == "") {
 
                                             <form class="form-horizontal" method="post">
 
+                                                <input id="id" name="id" type="hidden">
+
                                                 <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Full Name</label>
+                                                    <label for="default" class="col-sm-2 control-label">Username</label>
                                                     <div class="col-sm-10">
-                                                        <input type="text" name="name" class="form-control" id="fullanme" required="required" autocomplete="off">
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Teacher ID</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" name="id_no" class="form-control" id="rollid" maxlength="10" required="required" autocomplete="off">
+                                                        <input type="text" name="UserName" class="form-control" id="UserName" required="required" autocomplete="off">
                                                     </div>
                                                 </div>
 
 
+
                                                 <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Email Address</label>
+                                                    <label for="default" class="col-sm-2 control-label">Password</label>
                                                     <div class="col-sm-10">
-                                                        <input type="email" name="email" class="form-control" id="email" required="required" autocomplete="off">
+                                                        <input type="password" name="password" class="form-control" id="password" required="required" autocomplete="off">
                                                     </div>
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Phone Number</label>
+                                                    <label for="confpassword" class="col-sm-2 control-label">Confirm Password</label>
                                                     <div class="col-sm-10">
-                                                        <input type="phone" name="phone" class="form-control" id="phone" required="required" autocomplete="off">
+                                                        <input type="password" name="confpassword" class="form-control" id="confpassword" required="required" autocomplete="off">
                                                     </div>
                                                 </div>
+
 
                                                 <div class="form-group">
                                                     <div class="col-sm-offset-2 col-sm-10">
-                                                        <button type="submit" name="submit" class="btn btn-primary">Add</button>
+                                                        <button type="submit" name="submit" class="btn btn-primary">Create Admin</button>
                                                     </div>
                                                 </div>
                                             </form>
@@ -186,10 +191,6 @@ if (strlen($_SESSION['alogin']) == "") {
                         minimumResultsForSearch: Infinity
                     });
                 });
-
-                if (window.history.replaceState) {
-                    window.history.replaceState(null, null, window.location.href);
-                }
             </script>
     </body>
 

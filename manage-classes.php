@@ -147,17 +147,18 @@ if (strlen($_SESSION['alogin']) == "") {
                                             <?php } ?>
                                             <div class="panel-body p-20">
 
-                                                <table id="example" class="display table table-striped table-bordered" cellspacing="0" width="100%">
+                                                <table id="example" class="display table table-hover table-striped table-bordered" cellspacing="0" width="100%">
                                                     <thead>
                                                         <tr>
                                                             <th>#</th>
                                                             <th>Class Name</th>
-                                                            <th>Class Name Numeric</th>
+                                                            <th width="10">Code</th>
 
 
-                                                            <th>Section</th>
-                                                            <th>Creation Date</th>
-                                                            <th>Action</th>
+                                                            <th width="10">Section</th>
+                                                            <th>Date Created</th>
+                                                            <th>Number of Students</th>
+                                                            <th style="text-align: center">Action</th>
                                                         </tr>
                                                     </thead>
 
@@ -167,9 +168,6 @@ if (strlen($_SESSION['alogin']) == "") {
                                                         $query->execute();
                                                         $results = $query->fetchAll(PDO::FETCH_OBJ);
                                                         $cnt = 1;
-
-
-
 
                                                         if ($query->rowCount() > 0) {
                                                             foreach ($results as $result) {   ?>
@@ -183,6 +181,19 @@ if (strlen($_SESSION['alogin']) == "") {
                                                                     <td><?php echo htmlentities($result->ClassNameNumeric); ?></td>
                                                                     <td><?php echo htmlentities($result->Section); ?></td>
                                                                     <td><?php echo htmlentities($result->CreationDate); ?></td>
+
+                                                                    <td>
+                                                                        <?php
+                                                                        $q = "SELECT * FROM tblstudents WHERE ClassId = $result->id";
+                                                                        $d = $dbh->prepare($q);
+                                                                        $d->execute();
+                                                                        $r = $d->fetchAll(PDO::FETCH_OBJ);
+                                                                        $totalresults = $d->rowCount();
+
+                                                                        echo htmlentities($totalresults);
+
+                                                                        ?>
+                                                                    </td>
                                                                     <td>
                                                                         <a href="edit-class.php?classid=<?php echo htmlentities($result->id); ?>">
                                                                             <i class="btn-sm btn-info">Edit</i>

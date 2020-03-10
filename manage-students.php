@@ -1,9 +1,14 @@
 <?php
+
 session_start();
 error_reporting(0);
+
 include('includes/config.php');
+include('includes/functions.php');
+
 if (strlen($_SESSION['alogin']) == "") {
-    header("Location: index.php");
+
+    redirect_To('index.php');
 } else {
     if (isset($_POST['submit'])) {
         $studentname = $_POST['fullanme'];
@@ -27,10 +32,12 @@ if (strlen($_SESSION['alogin']) == "") {
         if ($lastInsertId) {
             $msg = "Student info added successfully";
         } else {
-            $error = "Something went wrong. Please try again";
+            $errors = $query->errorInfo();
+            $error = ($errors[2]);
         }
     }
-    ?>
+
+?>
     <!DOCTYPE html>
     <html lang="en">
 
@@ -47,6 +54,7 @@ if (strlen($_SESSION['alogin']) == "") {
         <link rel="stylesheet" type="text/css" href="js/DataTables/datatables.min.css" />
         <link rel="stylesheet" href="css/main.css" media="screen">
         <script src="js/modernizr/modernizr.min.js"></script>
+
         <style>
             .errorWrap {
                 padding: 10px;
@@ -66,6 +74,7 @@ if (strlen($_SESSION['alogin']) == "") {
                 box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .1);
             }
         </style>
+
     </head>
 
     <body class="top-navbar-fixed">
@@ -102,11 +111,8 @@ if (strlen($_SESSION['alogin']) == "") {
                             <!-- /.row -->
                         </div>
                         <!-- /.container-fluid -->
-
                         <section class="section">
                             <div class="container-fluid">
-
-
 
                                 <div class="row">
                                     <div class="col-md-12">
@@ -114,26 +120,22 @@ if (strlen($_SESSION['alogin']) == "") {
                                         <div class="panel">
                                             <div class="panel-heading">
                                                 <div class="panel-title">
-                                                <div class="container-fluid">
-
-
-                                                    <a style="float: right" class="btn btn-info" data-toggle="modal"
-                                                        data-target="#exampleModalCenter"> <i class="fa fa-plus">
-                                                        </i>Add Student
-                                                    </a>
-
+                                                    <div class="container-fluid">
+                                                        <h5 class="lead"> View All Students
+                                                            <a style="float: right" class="btn btn-info" data-toggle="modal" data-target="#exampleModalCenter">
+                                                                <i class="fa fa-plus"></i>Add Student
+                                                            </a>
+                                                        </h5>
                                                     </div>
-                                                    <h5>View Students Info</h5>
 
-                                                   
                                                 </div>
                                             </div>
                                             <?php if ($msg) { ?>
                                                 <div class="alert alert-success left-icon-alert" role="alert">
-                                                    <strong>Well done!</strong><?php echo htmlentities($msg); ?>
+                                                    <strong>Well done! </strong><?php echo htmlentities($msg); ?>
                                                 </div><?php } else if ($error) { ?>
                                                 <div class="alert alert-danger left-icon-alert" role="alert">
-                                                    <strong>Oh snap!</strong> <?php echo htmlentities($error); ?>
+                                                    <strong>Oh snap! </strong> <?php echo htmlentities($error); ?>
                                                 </div>
                                             <?php } ?>
                                             <div class="panel-body p-20">
@@ -143,22 +145,22 @@ if (strlen($_SESSION['alogin']) == "") {
                                                         <tr>
                                                             <th>#</th>
                                                             <th>Student Name</th>
-                                                            <th>Admission #</th>
+                                                            <th width="10">Adm#</th>
                                                             <th>Class</th>
                                                             <th>Admission Date</th>
-                                                            <th>Status</th>
+                                                            <th width="13">Status</th>
                                                             <th style="text-align:center">Action</th>
                                                         </tr>
                                                     </thead>
-                                                    
+
                                                     <tbody>
                                                         <?php $sql = "SELECT tblstudents.StudentName,tblstudents.RollId,tblstudents.RegDate,tblstudents.StudentId,tblstudents.Status,tblclasses.ClassName,tblclasses.Section from tblstudents join tblclasses on tblclasses.id=tblstudents.ClassId";
-                                                            $query = $dbh->prepare($sql);
-                                                            $query->execute();
-                                                            $results = $query->fetchAll(PDO::FETCH_OBJ);
-                                                            $cnt = 1;
-                                                            if ($query->rowCount() > 0) {
-                                                                foreach ($results as $result) {   ?>
+                                                        $query = $dbh->prepare($sql);
+                                                        $query->execute();
+                                                        $results = $query->fetchAll(PDO::FETCH_OBJ);
+                                                        $cnt = 1;
+                                                        if ($query->rowCount() > 0) {
+                                                            foreach ($results as $result) {   ?>
                                                                 <tr>
                                                                     <td><?php echo htmlentities($cnt); ?></td>
                                                                     <td><?php echo htmlentities($result->StudentName); ?></td>
@@ -166,24 +168,24 @@ if (strlen($_SESSION['alogin']) == "") {
                                                                     <td><?php echo htmlentities($result->ClassName); ?>(<?php echo htmlentities($result->Section); ?>)</td>
                                                                     <td><?php echo htmlentities($result->RegDate); ?></td>
                                                                     <td><?php if ($result->Status == 1) {
-                                                                                        echo htmlentities('Active');
-                                                                                    } else {
-                                                                                        echo htmlentities('Blocked');
-                                                                                    }
-                                                                                    ?></td>
-                                                                    <td style="text-align: center">
+                                                                            echo htmlentities('Active');
+                                                                        } else {
+                                                                            echo htmlentities('Blocked');
+                                                                        }
+                                                                        ?></td>
+                                                                    <td style="text-align:center">
                                                                         <a href="edit-student.php?stid=<?php echo htmlentities($result->StudentId); ?>">
-                                                                            <i class="btn-sm btn-info" >Edit</i>
+                                                                            <i class="btn-sm btn-info">Edit</i>
                                                                         </a>
-                                                                            
+
                                                                         <a href="delete-student.php?stid=<?php echo htmlentities($result->StudentId); ?>">
-                                                                            <i class="btn-sm btn-danger" >Delete </i>
+                                                                            <i class="btn-sm btn-danger">Delete </i>
                                                                         </a>
                                                                     </td>
                                                                 </tr>
                                                         <?php $cnt = $cnt + 1;
-                                                                }
-                                                            } ?>
+                                                            }
+                                                        } ?>
 
 
                                                     </tbody>
@@ -268,7 +270,7 @@ if (strlen($_SESSION['alogin']) == "") {
                                                 if ($query->rowCount() > 0) {
                                                     foreach ($results as $result) {   ?>
                                                         <option value="<?php echo htmlentities($result->id); ?>"><?php echo htmlentities($result->ClassName); ?>&nbsp; Section-<?php echo htmlentities($result->Section); ?></option>
-                                                    <?php }
+                                                <?php }
                                                 } ?>
                                             </select>
                                         </div>
@@ -282,11 +284,11 @@ if (strlen($_SESSION['alogin']) == "") {
 
 
 
-<!--                                    <div class="form-group">-->
-<!--                                        <div class="col-sm-offset-2 col-sm-10">-->
-<!--                                            <button type="submit" name="submit" class="btn btn-primary">Add</button>-->
-<!--                                        </div>-->
-<!--                                    </div>-->
+                                    <!--                                    <div class="form-group">-->
+                                    <!--                                        <div class="col-sm-offset-2 col-sm-10">-->
+                                    <!--                                            <button type="submit" name="submit" class="btn btn-primary">Add</button>-->
+                                    <!--                                        </div>-->
+                                    <!--                                    </div>-->
                                     <div class="modal-footer">
 
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Back
@@ -295,7 +297,7 @@ if (strlen($_SESSION['alogin']) == "") {
 
                                         <button type="submit" name="submit" class="btn btn-success btn-labeled">Submit
                                             <span class="btn-label btn-label-right"><i class="fa fa-plus"></i>
-                                        </span>
+                                            </span>
                                         </button>
 
                                     </div>
@@ -340,6 +342,12 @@ if (strlen($_SESSION['alogin']) == "") {
 
         <!-- ========== THEME JS ========== -->
         <script src="js/main.js"></script>
+        <script>
+            if (window.history.replaceState) {
+
+                window.history.replaceState(null, null, window.location.href);
+            }
+        </script>
         <script>
             $(function($) {
                 $('#example').DataTable();

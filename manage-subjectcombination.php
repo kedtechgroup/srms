@@ -28,7 +28,7 @@ if (strlen($_SESSION['alogin']) == "") {
         $query->execute();
         $msg = "Subject Deactivate successfully";
     }
-    ?>
+?>
     <!DOCTYPE html>
     <html lang="en">
 
@@ -126,6 +126,7 @@ if (strlen($_SESSION['alogin']) == "") {
                                             <div class="panel-body p-20">
 
                                                 <table id="example" class="display table table-striped table-bordered" cellspacing="0" width="100%">
+
                                                     <thead>
                                                         <tr>
                                                             <th>#</th>
@@ -135,58 +136,47 @@ if (strlen($_SESSION['alogin']) == "") {
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
-                                                    <tfoot>
-                                                        <tr>
-                                                            <th>#</th>
-                                                            <th>Class and Section</th>
-                                                            <th>Subject </th>
-                                                            <th>Status</th>
-                                                            <th>Action</th>
-                                                        </tr>
-                                                    </tfoot>
+
                                                     <tbody>
                                                         <?php $sql = "SELECT tblclasses.ClassName,tblclasses.Section,tblsubjects.SubjectName,tblsubjectcombination.id 
-                                                        as scid,tblsubjectcombination.status from tblsubjectcombination join tblclasses on tblclasses.id=tblsubjectcombination.ClassId  join tblsubjects on tblsubjects.id=tblsubjectcombination.SubjectId";
-                                                            $query = $dbh->prepare($sql);
-                                                            $query->execute();
-                                                            $results = $query->fetchAll(PDO::FETCH_OBJ);
-                                                            $cnt = 1;
-                                                            if ($query->rowCount() > 0) {
-                                                                foreach ($results as $result) {   ?>
+                                                        as scid,tblsubjectcombination.status from tblsubjectcombination join tblclasses on tblclasses.id=tblsubjectcombination.ClassId  join tblsubjects on tblsubjects.subject_id=tblsubjectcombination.SubjectId";
+                                                        $query = $dbh->prepare($sql);
+                                                        $query->execute();
+                                                        $results = $query->fetchAll(PDO::FETCH_OBJ);
+                                                        $cnt = 1;
+                                                        if ($query->rowCount() > 0) {
+                                                            foreach ($results as $result) {   ?>
                                                                 <tr>
                                                                     <td><?php echo htmlentities($cnt); ?></td>
                                                                     <td><?php echo htmlentities($result->ClassName); ?> &nbsp; Section-<?php echo htmlentities($result->Section); ?></td>
                                                                     <td><?php echo htmlentities($result->SubjectName); ?></td>
                                                                     <td><?php $stts = $result->status;
-                                                                                    if ($stts == '0') {
-                                                                                        echo htmlentities('Inactive');
-                                                                                    } else {
-                                                                                        echo htmlentities('Active');
-                                                                                    }
-                                                                                    ?></td>
+                                                                        if ($stts == '0') {
+                                                                            echo htmlentities('Inactive');
+                                                                        } else {
+                                                                            echo htmlentities('Active');
+                                                                        }
+                                                                        ?></td>
 
                                                                     <td>
                                                                         <?php if ($stts == '0') { ?>
                                                                             <a href="manage-subjectcombination.php?acid=<?php
-                                                                                echo htmlentities($result->scid);
-                                                                                ?>"
-                                                                               onclick="confirm('do you really want to ativate this subject');">
+                                                                                                                        echo htmlentities($result->scid);
+                                                                                                                        ?>" onclick="confirm('do you really want to ativate this subject');">
                                                                                 <i class="fa fa-check" title="Activate Record"></i>
                                                                             </a>
-                                                                        <?php }
-                                                                            else { ?>
+                                                                        <?php } else { ?>
 
                                                                             <a href="manage-subjectcombination.php?did=<?php
-                                                                                echo htmlentities($result->scid); ?>"
-                                                                               onclick="confirm('do you really want to deativate this subject'); ">
-                                                                                <i class="fa fa-times" title="Deactivate Record"></i>
+                                                                                                                        echo htmlentities($result->scid); ?>" onclick="confirm('do you really want to deativate this subject'); ">
+                                                                                <i class="fa fa-trash" title="Deactivate Record"></i>
                                                                             </a>
                                                                         <?php } ?>
                                                                     </td>
                                                                 </tr>
                                                         <?php $cnt = $cnt + 1;
-                                                                }
-                                                            } ?>
+                                                            }
+                                                        } ?>
 
 
                                                     </tbody>

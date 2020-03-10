@@ -3,33 +3,30 @@
 session_start();
 error_reporting(0);
 
-
+include('includes/config.php');
 include('includes/db.php');
-
-require_once('includes/functions.php');
+include('includes/functions.php');
 
 if (strlen($_SESSION['alogin']) == "") {
-    redirect_To("../index.php");
+
+    redirect_To("index.php");
 } else {
 
     if (isset($_POST['submit'])) {
 
         global $con;
 
-        $name = $_POST['name'];
-        $id_no = $_POST['id_no'];
-        $email = $_POST['email'];
-        $phone = $_POST['phone'];
+        $class = $_POST['class'];
+        $stream = $_POST['stream'];
+
+        $sql = "INSERT INTO `class_stream`(`class_id`, `stream_id`, `created_at`)
+                 VALUES ($class, $stream, CURRENT_TIMESTAMP())";
 
 
-        $query = "INSERT INTO `tblteachers`( `name`, `id_no`, `email`, `phone`, `created_at`)
-        VALUES ('$name', '$id_no', '$email', '$phone',  CURRENT_TIMESTAMP())";
-
-        $execute = mysqli_query($con, $query);
-
+        $execute = mysqli_query($con, $sql);
 
         if ($execute) {
-            $msg = "Teacher added successfully";
+            $msg = "Class Added To Stream.";
         } else {
             $error = mysqli_error($con);
         }
@@ -40,16 +37,17 @@ if (strlen($_SESSION['alogin']) == "") {
 
     <head>
         <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>SMS Admin| Teacher Registration< </title> <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
-                <link rel="stylesheet" href="css/font-awesome.min.css" media="screen">
-                <link rel="stylesheet" href="css/animate-css/animate.min.css" media="screen">
-                <link rel="stylesheet" href="css/lobipanel/lobipanel.min.css" media="screen">
-                <link rel="stylesheet" href="css/prism/prism.css" media="screen">
-                <link rel="stylesheet" href="css/select2/select2.min.css">
-                <link rel="stylesheet" href="css/main.css" media="screen">
-                <script src="js/modernizr/modernizr.min.js"></script>
+        <title>SRMS Add Subject to Class</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
+        <link rel="stylesheet" href="css/font-awesome.min.css" media="screen">
+        <link rel="stylesheet" href="css/animate-css/animate.min.css" media="screen">
+        <link rel="stylesheet" href="css/lobipanel/lobipanel.min.css" media="screen">
+        <link rel="stylesheet" href="css/prism/prism.css" media="screen">
+        <link rel="stylesheet" href="css/select2/select2.min.css">
+        <link rel="stylesheet" href="css/main.css" media="screen">
+        <script src="js/modernizr/modernizr.min.js"></script>
     </head>
 
     <body class="top-navbar-fixed">
@@ -70,7 +68,7 @@ if (strlen($_SESSION['alogin']) == "") {
                         <div class="container-fluid">
                             <div class="row page-title-div">
                                 <div class="col-md-6">
-                                    <h2 class="title">Add New Teacher</h2>
+                                    <h2 class="title">Add Subject To Class</h2>
 
                                 </div>
 
@@ -81,17 +79,15 @@ if (strlen($_SESSION['alogin']) == "") {
                                 <div class="col-md-6">
                                     <ul class="breadcrumb">
                                         <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-
-                                        <li class="active">Teacher Registration</li>
+                                        <li> <a href="manage-subjects.php"> Stream</a></li>
+                                        <li class="active">Add Class Subject Combination</li>
                                     </ul>
                                 </div>
 
                             </div>
                             <!-- /.row -->
                         </div>
-
                         <br>
-
                         <div class="container-fluid">
 
                             <div class="row">
@@ -99,61 +95,77 @@ if (strlen($_SESSION['alogin']) == "") {
                                     <div class="panel">
                                         <div class="panel-heading">
                                             <div class="panel-title">
-                                                <h5>Fill the Teacher info</h5>
+                                                <h5>Add Subject To Class</h5>
                                             </div>
                                         </div>
                                         <div class="panel-body">
-
                                             <?php if ($msg) { ?>
                                                 <div class="alert alert-success left-icon-alert" role="alert">
-                                                    <strong>Well done! </strong><?php echo htmlentities($msg); ?>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
-                                                        <span aria-hidden="true"> &times; </span>
-                                                    </button>
+                                                    <strong>Success!</strong><?php echo htmlentities($msg); ?>
                                                 </div><?php } else if ($error) { ?>
                                                 <div class="alert alert-danger left-icon-alert" role="alert">
-                                                    <strong>Oh snap! </strong> <?php echo htmlentities($error); ?>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
-                                                        <span aria-hidden="true"> &times; </span>
-                                                    </button>
+                                                    <strong>Oh snap!</strong> <?php echo htmlentities($error); ?>
                                                 </div>
                                             <?php } ?>
 
                                             <form class="form-horizontal" method="post">
 
-                                                <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Full Name</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" name="name" class="form-control" id="fullanme" required="required" autocomplete="off">
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Teacher ID</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" name="id_no" class="form-control" id="rollid" maxlength="10" required="required" autocomplete="off">
-                                                    </div>
-                                                </div>
 
 
                                                 <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Email Address</label>
+                                                    <label for="default" class="col-sm-2 control-label">Stream</label>
                                                     <div class="col-sm-10">
-                                                        <input type="email" name="email" class="form-control" id="email" required="required" autocomplete="off">
+
+                                                        <select name="stream" class="form-control" id="default" required="required">
+
+                                                            <option value="">Select Stream</option>
+
+                                                            <?php
+                                                            $sql = "SELECT * from stream";
+
+                                                            $query = $dbh->prepare($sql);
+
+                                                            $query->execute();
+
+                                                            $results = $query->fetchAll(PDO::FETCH_OBJ);
+
+                                                            if ($query->rowCount() > 0) {
+                                                                foreach ($results as $result) {   ?>
+                                                                    <option value="<?php echo htmlentities($result->id); ?>">
+                                                                        <?php echo htmlentities($result->name); ?></option>
+                                                            <?php }
+                                                            } ?>
+                                                        </select>
                                                     </div>
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Phone Number</label>
+                                                    <label for="default" class="col-sm-2 control-label">Class</label>
                                                     <div class="col-sm-10">
-                                                        <input type="phone" name="phone" class="form-control" id="phone" required="required" autocomplete="off">
+                                                        <select name="class" class="form-control" id="default" required="required">
+                                                            <option value="">Select Class</option>
+
+                                                            <?php
+                                                            $sql = "SELECT * from tblclasses";
+                                                            $query = $dbh->prepare($sql);
+                                                            $query->execute();
+                                                            $results = $query->fetchAll(PDO::FETCH_OBJ);
+                                                            if ($query->rowCount() > 0) {
+                                                                foreach ($results as $result) {   ?>
+                                                                    <option value="<?php echo htmlentities($result->id); ?>"><?php echo htmlentities($result->ClassName); ?>&nbsp; Section-<?php echo htmlentities($result->Section); ?></option>
+                                                            <?php }
+                                                            } ?>
+                                                        </select>
                                                     </div>
                                                 </div>
 
                                                 <div class="form-group">
                                                     <div class="col-sm-offset-2 col-sm-10">
                                                         <button type="submit" name="submit" class="btn btn-primary">Add</button>
+
                                                     </div>
                                                 </div>
+
                                             </form>
 
                                         </div>
@@ -194,4 +206,4 @@ if (strlen($_SESSION['alogin']) == "") {
     </body>
 
     </html>
-<?PHP } ?>
+<?php } ?>

@@ -1,35 +1,28 @@
 <?php
-
 session_start();
 error_reporting(0);
 
-
+include('includes/config.php');
 include('includes/db.php');
 
-require_once('includes/functions.php');
-
 if (strlen($_SESSION['alogin']) == "") {
-    redirect_To("../index.php");
+    header("Location: index.php");
 } else {
 
     if (isset($_POST['submit'])) {
 
+        $teacher_id = $_POST['teacher_id'];
+        $subject_id = $_POST['subject_id'];
+
         global $con;
 
-        $name = $_POST['name'];
-        $id_no = $_POST['id_no'];
-        $email = $_POST['email'];
-        $phone = $_POST['phone'];
+        $query = "INSERT INTO `teacher_subject`(`teacher_id`, `subject_id`, `created_at`) 
+        VALUES ('$teacher_id','$subject_id',CURRENT_TIMESTAMP())";
 
-
-        $query = "INSERT INTO `tblteachers`( `name`, `id_no`, `email`, `phone`, `created_at`)
-        VALUES ('$name', '$id_no', '$email', '$phone',  CURRENT_TIMESTAMP())";
-
-        $execute = mysqli_query($con, $query);
-
+        $execute = mysqli_query($con, $query) or die(mysqli_error($con));
 
         if ($execute) {
-            $msg = "Teacher added successfully";
+            $msg = "Subject teacher added succesfully";
         } else {
             $error = mysqli_error($con);
         }
@@ -42,14 +35,15 @@ if (strlen($_SESSION['alogin']) == "") {
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>SMS Admin| Teacher Registration< </title> <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
-                <link rel="stylesheet" href="css/font-awesome.min.css" media="screen">
-                <link rel="stylesheet" href="css/animate-css/animate.min.css" media="screen">
-                <link rel="stylesheet" href="css/lobipanel/lobipanel.min.css" media="screen">
-                <link rel="stylesheet" href="css/prism/prism.css" media="screen">
-                <link rel="stylesheet" href="css/select2/select2.min.css">
-                <link rel="stylesheet" href="css/main.css" media="screen">
-                <script src="js/modernizr/modernizr.min.js"></script>
+        <title>SMS Admin Subject Creation </title>
+        <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
+        <link rel="stylesheet" href="css/font-awesome.min.css" media="screen">
+        <link rel="stylesheet" href="css/animate-css/animate.min.css" media="screen">
+        <link rel="stylesheet" href="css/lobipanel/lobipanel.min.css" media="screen">
+        <link rel="stylesheet" href="css/prism/prism.css" media="screen">
+        <link rel="stylesheet" href="css/select2/select2.min.css">
+        <link rel="stylesheet" href="css/main.css" media="screen">
+        <script src="js/modernizr/modernizr.min.js"></script>
     </head>
 
     <body class="top-navbar-fixed">
@@ -70,7 +64,7 @@ if (strlen($_SESSION['alogin']) == "") {
                         <div class="container-fluid">
                             <div class="row page-title-div">
                                 <div class="col-md-6">
-                                    <h2 class="title">Add New Teacher</h2>
+                                    <h2 class="title">Subject Creation</h2>
 
                                 </div>
 
@@ -81,17 +75,16 @@ if (strlen($_SESSION['alogin']) == "") {
                                 <div class="col-md-6">
                                     <ul class="breadcrumb">
                                         <li><a href="dashboard.php"><i class="fa fa-home"></i> Home</a></li>
-
-                                        <li class="active">Teacher Registration</li>
+                                        <li> Subjects</li>
+                                        <li class="active">Create Subject</li>
                                     </ul>
                                 </div>
 
                             </div>
+
                             <!-- /.row -->
                         </div>
-
                         <br>
-
                         <div class="container-fluid">
 
                             <div class="row">
@@ -99,59 +92,69 @@ if (strlen($_SESSION['alogin']) == "") {
                                     <div class="panel">
                                         <div class="panel-heading">
                                             <div class="panel-title">
-                                                <h5>Fill the Teacher info</h5>
+                                                <h5>Create Subject</h5>
                                             </div>
                                         </div>
                                         <div class="panel-body">
-
                                             <?php if ($msg) { ?>
                                                 <div class="alert alert-success left-icon-alert" role="alert">
-                                                    <strong>Well done! </strong><?php echo htmlentities($msg); ?>
+                                                    <strong>Well done!</strong><?php echo htmlentities($msg); ?>
                                                     <button type="button" class="close" data-dismiss="alert" aria-label="close">
                                                         <span aria-hidden="true"> &times; </span>
                                                     </button>
                                                 </div><?php } else if ($error) { ?>
                                                 <div class="alert alert-danger left-icon-alert" role="alert">
-                                                    <strong>Oh snap! </strong> <?php echo htmlentities($error); ?>
+                                                    <strong>Oh snap!</strong> <?php echo htmlentities($error); ?>
                                                     <button type="button" class="close" data-dismiss="alert" aria-label="close">
                                                         <span aria-hidden="true"> &times; </span>
                                                     </button>
                                                 </div>
                                             <?php } ?>
-
                                             <form class="form-horizontal" method="post">
-
                                                 <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Full Name</label>
+                                                    <label for="default" class="col-sm-2 control-label">Teachers Name</label>
                                                     <div class="col-sm-10">
-                                                        <input type="text" name="name" class="form-control" id="fullanme" required="required" autocomplete="off">
+                                                        <select name="teacher_id" class="form-control" id="default" required="required">
+                                                            <option value="" disabled>Select Teacher</option>
+
+                                                            <?php
+                                                            $sql = "SELECT * from tblteachers";
+                                                            $query = $dbh->prepare($sql);
+                                                            $query->execute();
+                                                            $results = $query->fetchAll(PDO::FETCH_OBJ);
+                                                            if ($query->rowCount() > 0) {
+                                                                foreach ($results as $result) {   ?>
+                                                                    <option value="<?php echo htmlentities($result->teacher_id); ?>"><?php echo htmlentities($result->name); ?></option>
+                                                            <?php }
+                                                            } ?>
+                                                        </select>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Teacher ID</label>
+                                                    <label for="default" class="col-sm-2 control-label">Subject Name</label>
                                                     <div class="col-sm-10">
-                                                        <input type="text" name="id_no" class="form-control" id="rollid" maxlength="10" required="required" autocomplete="off">
+                                                        <select name="subject_id" class="form-control" id="default" required="required">
+                                                            <option disabled value="">Select Subject</option>
+
+                                                            <?php
+                                                            $sql = "SELECT * from tblsubjects";
+                                                            $query = $dbh->prepare($sql);
+                                                            $query->execute();
+                                                            $results = $query->fetchAll(PDO::FETCH_OBJ);
+                                                            if ($query->rowCount() > 0) {
+                                                                foreach ($results as $result) {   ?>
+                                                                    <option value="<?php echo htmlentities($result->subject_id); ?>"><?php echo htmlentities($result->SubjectName); ?></option>
+                                                            <?php }
+                                                            } ?>
+                                                        </select>
                                                     </div>
                                                 </div>
 
 
-                                                <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Email Address</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="email" name="email" class="form-control" id="email" required="required" autocomplete="off">
-                                                    </div>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label for="default" class="col-sm-2 control-label">Phone Number</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="phone" name="phone" class="form-control" id="phone" required="required" autocomplete="off">
-                                                    </div>
-                                                </div>
 
                                                 <div class="form-group">
                                                     <div class="col-sm-offset-2 col-sm-10">
-                                                        <button type="submit" name="submit" class="btn btn-primary">Add</button>
+                                                        <button type="submit" name="submit" class="btn btn-primary">Submit</button>
                                                     </div>
                                                 </div>
                                             </form>
@@ -186,7 +189,8 @@ if (strlen($_SESSION['alogin']) == "") {
                         minimumResultsForSearch: Infinity
                     });
                 });
-
+            </script>
+            <script>
                 if (window.history.replaceState) {
                     window.history.replaceState(null, null, window.location.href);
                 }
